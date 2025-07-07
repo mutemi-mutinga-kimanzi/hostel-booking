@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign Up | Avocado Platform</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #56ccf2, #2f80ed);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .signup-box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      width: 400px;
+    }
+    .signup-box h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+    .signup-box select,
+    .signup-box input,
+    .signup-box button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .signup-box button {
+      background-color: #2f80ed;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+    .signup-box button:hover {
+      background-color: #2566c7;
+    }
+    .message {
+      color: red;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-box">
+    <h2>Sign Up</h2>
+    <form id="signupForm">
+      <select name="role" id="role" required>
+        <option value="">-- Select Role --</option>
+        <option value="user">User</option>
+        
+      </select>
+      <input type="text" id="username" name="username" placeholder="Username or Reg No." required />
+      <input type="email" id="email" name="email" placeholder="Email Address" required />
+      <input type="password" id="password" name="password" placeholder="Password" required />
+      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required />
+      <button type="submit">Sign Up</button>
+      <div class="message" id="messageBox"></div>
+      Already have an account? <a href="log.html">Log in</a>
+    </form>        
+  </div>
+
+  <script>
+  document.getElementById("signupForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const role = document.getElementById("role").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
+    const messageBox = document.getElementById("messageBox");
+
+    const userRegex = /^[A-Z]\/[A-Z]+\/\d+\/\d+$/;
+    const adminRegex = /^[a-zA-Z0-9]+$/;
+
+    if (!role || !username || !email || !password || !confirmPassword) {
+      messageBox.textContent = "All fields are required.";
+      return;
+    }
+
+    if (role === "user" && !userRegex.test(username)) {
+      messageBox.textContent = "Username must follow format: A/ABC/12/34";
+      return;
+    }
+
+    if (role === "admin") {
+      if (!adminRegex.test(username)) {
+        messageBox.textContent = "Admin username must be alphanumeric.";
+        return;
+      }
+      // Prevent storing admin in database
+      messageBox.textContent = "Admin account is already set up. Please log in.";
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      messageBox.textContent = "Passwords do not match.";
+      return;
+    }
+
+    const data = { role, username, email, password };
+
+    fetch('http://127.0.0.1:5000/signup', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(response => {
+      if (response.status === "success") {
+        window.location.href = "/home.html";
+      } else {
+        messageBox.textContent = response.message || "Sign-up failed.";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      messageBox.textContent = "Something went wrong. Try again.";
+    });
+  });
+</script>
+
+</body>
+</html>

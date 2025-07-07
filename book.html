@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hostel Booking</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #eef2f3;
+      padding: 30px;
+      text-align: center;
+    }
+    .btn {
+      margin: 10px;
+      padding: 12px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Hostel Room Booking</h1>
+
+  <div>
+    <h2>Select Gender</h2>
+    <button class="btn" onclick="selectGender('boys')">Boys</button>
+    <button class="btn" onclick="selectGender('girls')">Girls</button>
+  </div>
+
+  <div class="hidden" id="blockSection">
+    <h2>Select Block (<span id="selectedGender"></span>)</h2>
+    <div id="blocks"></div>
+  </div>
+
+  <div class="hidden" id="roomSection">
+    <h2>Rooms in Block <span id="selectedBlock"></span></h2>
+    <div id="rooms"></div>
+  </div>
+
+  <script>
+    let gender = "";
+    let block = "";
+
+    function selectGender(g) {
+      gender = g;
+      document.getElementById('selectedGender').textContent = g;
+      document.getElementById('blockSection').classList.remove('hidden');
+
+      const blocks = ['A', 'B', 'C', 'D'];
+      const container = document.getElementById('blocks');
+      container.innerHTML = "";
+
+      blocks.forEach(b => {
+        const btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = `Block ${b}`;
+        btn.onclick = () => loadRooms(b);
+        container.appendChild(btn);
+      });
+    }
+
+    function loadRooms(b) {
+      block = b;
+      document.getElementById('selectedBlock').textContent = block;
+      document.getElementById('roomSection').classList.remove('hidden');
+
+      fetch(`/api/rooms?gender=${gender}&block=${block}`)
+        .then(res => res.json())
+        .then(rooms => {
+          const roomContainer = document.getElementById('rooms');
+          roomContainer.innerHTML = "";
+
+          rooms.forEach(room => {
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.textContent = `Room ${room.room_no} (${room.occupants}/4)`;
+            btn.disabled = room.occupants >= 4;
+            btn.onclick = () => bookRoom(room.room_no);
+            roomContainer.appendChild(btn);
+          });
+        });
+    }
+
+    function bookRoom(roomNo) {
+  const name = prompt("Enter your registration number (e.g. U/CSC/1234/56):");
+  if (!name) return;
+
+  const regEx = /^[A-Z]\/[A-Z]+\/\d+\/\d+$/;
+  if (!regEx.test(name.trim())) {
+    alert("Invalid registration number format. Please use format: U/DEPT/1234/56");
+    return;
+  }
+
+      fetch('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, gender, block, room_no: roomNo })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        loadRooms(block);
+      });
+    }
+  </script>
+
+</body>
+</html>

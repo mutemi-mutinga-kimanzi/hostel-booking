@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <style>
+    nav { background: #333; padding: 10px; color: white; display: flex; justify-content: space-between; }
+    nav a { color: white; margin: 0 10px; text-decoration: none; font-weight: bold; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    th, td { padding: 8px; border: 1px solid #ddd; text-align: center; }
+    button { padding: 5px 10px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <span>Admin Dashboard</span>
+    <div>
+      <a href="/">Home</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <h2 style="text-align:center;">Registered Users</h2>
+  <p style="text-align:center;">Hostel Status: <strong>{{ status }}</strong></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Booked Room</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user[0] }}</td>
+        <td>{{ user[1] }}</td>
+        <td>{{ user[2] }}</td>
+        <td>
+          <button onclick="deleteUser('{{ user[0] }}')">Delete</button>
+          <button onclick="updateUser('{{ user[0] }}')">Update</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <script>
+    function deleteUser(username) {
+      if (confirm(`Delete user ${username}?`)) {
+        fetch('/delete_user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || 'User deleted');
+          window.location.reload();
+        });
+      }
+    }
+
+    function updateUser(username) {
+      const email = prompt("Enter new email:");
+      const booked_room = prompt("Enter new booked room:");
+      if (email && booked_room) {
+        fetch('/update_user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, booked_room })
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || 'User updated');
+          window.location.reload();
+        });
+      }
+    }
+  </script>
+</body>
+</html>

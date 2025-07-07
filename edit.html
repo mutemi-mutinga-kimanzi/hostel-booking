@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f9f4;
+            color: #003300;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            background-color: #472a03; /* KMTC green */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: 0;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 15px;
+            color: #003300;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #ffcc00; /* KMTC yellow/gold */
+            color: #003300;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #e6b800;
+        }
+    </style>
+</head>
+<body>
+    <h2>Edit Booking</h2>
+    <form method="POST" action="{{ url_for('update_booking', booking_id=booking['id']) }}">
+        <label>Name: <input type="text" name="name" value="{{ booking['name'] }}"></label>
+        <label>Gender: <input type="text" name="gender" value="{{ booking['gender'] }}"></label>
+        <label>Block: <input type="text" name="block" value="{{ booking['block'] }}"></label>
+        <label>Room No: <input type="number" name="room_no" value="{{ booking['room_no'] }}"></label>
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

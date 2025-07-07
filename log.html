@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Log In | Avocado Platform</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #8e9eab, #eef2f3);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .login-box {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      width: 400px;
+    }
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+    .login-box select,
+    .login-box input,
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .login-box button {
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+    .login-box button:hover {
+      background-color: #388e3c;
+    }
+    .message {
+      color: red;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Log In</h2>
+    <form id="loginForm">
+      <select name="role" id="role" required>
+        <option value="">-- Select Role --</option>
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+      <input type="text" id="username" name="username" placeholder="Username or Reg No." required />
+      <input type="password" id="password" name="password" placeholder="Password" required />
+      <button type="submit">Log In</button>
+      <div class="message" id="messageBox"></div>
+      Don't have an account? <a href="sign.html">Sign up</a>
+    </form>         
+  </div>
+
+  <script>
+  document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const role = document.getElementById("role").value.toLowerCase();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const messageBox = document.getElementById("messageBox");
+
+    if (!role || !username || !password) {
+      messageBox.textContent = "All fields are required.";
+      return;
+    }
+
+    fetch("http://127.0.0.1:5000/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ role, username, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        window.location.href = data.redirect;
+      } else {
+        messageBox.textContent = data.message || "Login failed.";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      messageBox.textContent = "Something went wrong.";
+    });
+  });
+</script>
+
+</body>
+</html>
